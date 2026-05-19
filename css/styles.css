@@ -6,9 +6,9 @@
 
 /* ── CSS Variables / Design Tokens ── */
 :root {
-  --bg-base:        #0a0505;
-  --bg-surface:     #140a0a;
-  --bg-elevated:    #1f0f0f;
+  --bg-base:        #050505;
+  --bg-surface:     #121212;
+  --bg-elevated:    #1e1e1e;
   --bg-card:        rgba(255, 255, 255, 0.04);
   --bg-card-hover:  rgba(255, 255, 255, 0.07);
 
@@ -67,9 +67,9 @@ body::before {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,51,51,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(204,0,0,0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,102,102,0.03) 0%, transparent 70%);
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,255,255,0.02) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(255,51,51,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(255,255,255,0.015) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -89,7 +89,7 @@ body::before {
   align-items: center;
   justify-content: space-between;
   padding: 16px 28px;
-  background: rgba(13, 15, 26, 0.85);
+  background: rgba(10, 10, 10, 0.85);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border);
   position: sticky;
