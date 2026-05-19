@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Hyperlink Editor — Edita los hipervínculos de tu PDF</title>
+  <meta name="description" content="Herramienta online gratuita para editar hipervínculos en archivos PDF. Detecta todos los links automáticamente y permite reemplazarlos con nuevas URLs. 100% en el navegador, sin servidores." />
+  <meta name="keywords" content="editar hipervínculos PDF, cambiar links PDF, PDF editor online, hyperlink editor" />
+  <meta name="author" content="PDF Hyperlink Editor" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="PDF Hyperlink Editor" />
+  <meta property="og:description" content="Edita los hipervínculos de cualquier PDF directamente en tu navegador. Gratis y sin subir datos a servidores." />
+  <meta property="og:type" content="website" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <!-- PDF.js (Mozilla CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <!-- pdf-lib (unpkg) -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ══════════════ HEADER ══════════════ -->
+  <header class="app-header" role="banner">
+    <div class="header-logo">
+      <div class="logo-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+      </div>
+      <h1 class="app-title">PDF <span>Hyperlink</span> Editor</h1>
+    </div>
+    <span class="header-badge">100% Local • Sin Servidores</span>
+  </header>
+
+  <!-- ══════════════ MAIN ══════════════ -->
+  <main class="app-main" role="main">
+
+    <!-- ── LEFT PANEL: PDF VIEWER ── -->
+    <section class="panel-left" aria-label="Vista previa del PDF">
+
+      <!-- Drop Zone -->
+      <div class="drop-zone" id="drop-zone" role="button" tabindex="0"
+           aria-label="Zona de carga de PDF — Arrastra un archivo o haz clic para seleccionar">
+        <div class="drop-zone-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <h2 class="drop-zone-title">Arrastra tu PDF aquí</h2>
+        <p class="drop-zone-sub">
+          O haz clic para seleccionar un archivo.<br/>
+          Todos los hipervínculos serán detectados automáticamente.
+        </p>
+        <button class="btn-upload" id="btn-upload-trigger" aria-label="Seleccionar archivo PDF">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Seleccionar PDF
+        </button>
+        <input type="file" id="file-input" accept=".pdf,application/pdf"
+               style="display:none" aria-label="Seleccionar archivo PDF" />
+      </div>
+
+      <!-- PDF Viewer -->
+      <div class="pdf-viewer-wrapper hidden" id="viewer-wrapper">
+        <!-- Toolbar -->
+        <div class="viewer-toolbar">
+          <span class="viewer-filename" id="viewer-filename" title=""></span>
+
+          <div class="page-controls" role="navigation" aria-label="Navegación de páginas">
+            <button class="btn-page" id="btn-prev" disabled aria-label="Página anterior">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+            <span class="page-indicator" id="page-indicator">Página 1 de 1</span>
+            <button class="btn-page" id="btn-next" disabled aria-label="Página siguiente">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+            
+            <div class="divider-vertical"></div>
+            
+            <button class="btn-draw" id="btn-draw" aria-label="Añadir nuevo hipervínculo dibujando" title="Dibujar área interactiva">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              Añadir Enlace
+            </button>
+          </div>
+
+          <button class="btn-change-file" id="btn-change-file" aria-label="Cargar otro PDF">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Cambiar PDF
+          </button>
+        </div>
+
+        <!-- Canvas -->
+        <div class="pdf-canvas-container">
+          <div class="canvas-wrapper" id="canvas-wrapper">
+            <canvas id="pdf-canvas" aria-label="Vista previa del PDF"></canvas>
+            <div class="drawing-layer" id="drawing-layer"></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── RIGHT PANEL: LINK EDITOR ── -->
+    <aside class="panel-right" aria-label="Editor de hipervínculos">
+
+      <!-- Panel header -->
+      <div class="panel-header">
+        <div class="panel-header-top">
+          <h2 class="panel-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+            </svg>
+            Hipervínculos detectados
+          </h2>
+          <span class="links-count-badge" id="links-count">0</span>
+        </div>
+
+        <!-- Search -->
+        <div class="panel-search">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <input
+            type="search"
+            id="search-input"
+            placeholder="Buscar por URL..."
+            aria-label="Buscar hipervínculos"
+          />
+        </div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="filter-tabs" role="tablist" aria-label="Filtrar hipervínculos">
+        <button class="filter-tab active" id="filter-all" role="tab" aria-selected="true">
+          Todos
+        </button>
+        <button class="filter-tab" id="filter-modified" role="tab" aria-selected="false">
+          Modificados
+        </button>
+      </div>
+
+      <!-- Links List -->
+      <div class="links-list" id="links-list" role="list">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <p>Carga un PDF para detectar sus hipervínculos automáticamente.</p>
+        </div>
+      </div>
+
+      <!-- Footer / Download -->
+      <div class="panel-footer">
+        <!-- Compress option -->
+        <label class="compress-option" id="compress-option" for="compress-check"
+               aria-label="Comprimir PDF al descargar">
+          <input type="checkbox" id="compress-check" />
+          <div class="checkbox-inner" id="compress-inner">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="2 6 5 9 10 3"/>
+            </svg>
+          </div>
+          <div class="compress-text">
+            <strong>Comprimir PDF</strong>
+            <small>Elimina metadata y optimiza la estructura</small>
+          </div>
+        </label>
+
+        <!-- Download Button -->
+        <button class="btn-download" id="btn-download" disabled
+                aria-label="Descargar PDF con hipervínculos modificados">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Descargar PDF Editado
+        </button>
+      </div>
+
+    </aside>
+
+  </main>
+
+</div><!-- /#app -->
+
+<!-- ══════════════ LOADING OVERLAY ══════════════ -->
+<div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite">
+  <div class="spinner" aria-hidden="true"></div>
+  <p class="loading-text" id="loading-text">Procesando...</p>
+  <p class="loading-sub" id="loading-sub"></p>
+</div>
+
+<!-- ══════════════ TOAST CONTAINER ══════════════ -->
+<div class="toast-container" id="toast-container" role="log" aria-live="polite" aria-atomic="false"></div>
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script>
+  // Configure PDF.js worker
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+</script>
+<script src="js/pdf-parser.js"></script>
+<script src="js/pdf-editor.js"></script>
+<script src="js/pdf-viewer.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
