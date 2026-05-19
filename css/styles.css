@@ -56,8 +56,8 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg-base);
   color: var(--text-primary);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -80,7 +80,7 @@ body::before {
   z-index: 1;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 /* ── Header ── */
@@ -151,7 +151,7 @@ body::before {
   grid-template-rows: 1fr;
   gap: 0;
   overflow: hidden;
-  height: calc(100vh - 65px);
+  height: calc(100vh - 69px);
 }
 
 /* ── Left Panel — PDF Preview ── */
